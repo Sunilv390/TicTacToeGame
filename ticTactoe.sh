@@ -17,3 +17,15 @@ function resetBoard(){
 		done
 	done
 }
+resetBoard
+#ASSIGNING PLAYER'S SYMBOL
+function assignPlayer(){
+	if [ $((RANDOM%2)) -eq 0 ]
+	then
+		Player=X
+	else
+		Player=O
+	fi
+		echo "Symbol is "$Player
+}
+assignPlayer
