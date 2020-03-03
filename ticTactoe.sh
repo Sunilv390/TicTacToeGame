@@ -274,8 +274,8 @@ function  computerCheck(){
 }
 
 resetBoard
+initializeBoard
 assignPlayer
 isToss
-initializeBoard
 getInput
 getBoard
