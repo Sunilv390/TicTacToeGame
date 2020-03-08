@@ -3,6 +3,10 @@
 #CONSTANTS
 ROW=3
 COLUMN=3
+LENGTH=$(($ROW*$COLUMN))
+
+#VARIABLE
+cell=0
 
 declare -A board
 
@@ -18,7 +22,18 @@ function resetBoard(){
 		done
 	done
 }
-resetBoard
+
+#INITIALIZING BOARD
+function initializeBoard(){
+	for (( i=0; i<ROW; i++ ))
+	do
+		for (( j=0; j<COLUMN; j++ ))
+		do
+			board[$i,$j]=$cell
+			((cell++))
+		done
+	done
+}
 
 #ASSIGNING PLAYER'S SYMBOL
 function assignPlayer(){
@@ -30,7 +45,6 @@ function assignPlayer(){
 	fi
 		echo "Symbol is "$Player
 }
-assignPlayer
 
 #TOSS
 function isToss(){
@@ -41,7 +55,6 @@ function isToss(){
 		printf "Computer's turns\n"
 	fi
 }
-isToss
 
 #DISPLAY BOARD
 function getBoard(){
@@ -51,4 +64,74 @@ function getBoard(){
 	echo "---------------"
 	echo " | "${board[2,0]}" | "${board[2,1]}" | "${board[2,2]}" | "
 }
+
+#GETTING INPUT
+function getInput(){
+   for (( i=0; i<$LENGTH; i++ ))
+   do
+      getBoard
+      read -p "Enter a position " position
+      if [ $position -gt $LENGTH ]
+      then
+         echo "Invalid Moves"
+         ((i--))
+      else
+         rowIndex=$(( $position / $ROW ))
+         if [ $(( $position % $ROW )) -eq 0 ]
+         then
+            rowIndex=$(( $rowIndex-1 ))
+         fi
+         columnIndex=$(( $position % $COLUMN ))
+         if [ $columnIndex -eq 0 ]
+         then
+            columnIndex=$(($columnIndex+2))
+         else
+            columnIndex=$(($columnIndex-1))
+         fi
+         board[$rowIndex,$columnIndex]=$Player
+         if [ $(checkResult) -eq 1 ]
+         then
+            echo "You Win"
+            return 0
+         fi
+      fi
+   done
+}
+
+#CHECK'S WINNER
+function checkResult(){
+   if [ ${board[0,0]} == $Player ] && [ ${board[0,1]} == $Player ] && [ ${board[0,2]} == $Player ]
+   then
+      echo 1
+   elif [ ${board[1,0]} == $Player ] && [ ${board[1,1]} == $Player ] && [ ${board[1,2]} == $Player ]
+   then
+      echo 1
+   elif [ ${board[2,0]} == $Player ] && [ ${board[2,1]} == $Player ] && [ ${board[2,2]} == $Player ]
+   then
+      echo 1
+   elif [ ${board[0,0]} == $Player ] && [ ${board[1,0]} == $Player ] && [ ${board[2,0]} == $Player ]
+   then
+      echo 1
+   elif [ ${board[0,1]} == $Player ] && [ ${board[1,1]} == $Player ] && [ ${board[2,1]} == $Player ]
+   then
+      echo 1
+   elif [ ${board[0,2]} == $Player ] && [ ${board[1,2]} == $Player ] && [ ${board[2,2]} == $Player ]
+   then
+      echo 1
+   elif [ ${board[0,0]} == $Player ] && [ ${board[1,1]} == $Player ] && [ ${board[2,2]} == $Player ]
+   then
+      echo 1
+   elif [ ${board[0,2]} == $Player ] && [ ${board[1,1]} == $Player ] && [ ${board[2,0]} == $Player ]
+   then
+      echo 1
+   else
+      echo 0
+   fi
+}
+
+resetBoard
+assignPlayer
+isToss
+initializeBoard
+getInput
 getBoard
