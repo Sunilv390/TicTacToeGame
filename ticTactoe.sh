@@ -7,9 +7,6 @@ LENGTH=$(($ROW*$COLUMN))
 
 #VARIABLE
 cell=1
-isCorner=''
-isCenter=''
-cellBlocked=''
 
 declare -A board
 
@@ -122,11 +119,17 @@ function getInput(){
             exit
          fi
          isBlockingCell
-         checkCornerAndCenter
-         if [ $isCorner == true ] || [ $isCenter == true ]
+         if [[ $cellBlocked == true ]]
          then
-            $isCorner=false
-            $isCenter=false
+            cellBlocked=flase
+         else
+            checkCornerCenterAndSides
+            if [ $isCorner == true ] || [ $isCenter == true ] || [ $isSide == false ]
+            then
+               isCorner=false
+               isCenter=false
+               isSide=false
+            fi
          fi
          flag=1
       fi
@@ -397,8 +400,8 @@ function checkCompWin(){
    fi
 }
 
-function checkCornerAndCenter()
-{
+#CHECKING CENTER SIDES AND CORNER AVAILABILITY
+function checkCornerCenterAndSides(){
    if [ ${board[0,0]} != $Player ] && [ ${board[0,0]} != $Computer ]
    then
       board[0,0]=$Computer
@@ -419,6 +422,22 @@ function checkCornerAndCenter()
    then
       board[1,1]=$Computer
       isCenter=true
+   elif [ ${board[0,1]} != $Player ] && [ ${board[0,1]} != $Computer ]
+   then
+      board[0,1]=$Computer
+      isSide=true
+   elif [ ${board[1,2]} != $Player ] && [ ${board[1,2]} != $Computer ]
+   then
+      board[1,2]=$Computer
+      isSide=true
+   elif [ ${board[2,1]} != $Player ] && [ ${board[2,1]} != $Computer ]
+   then
+      board[2,1]=$Computer
+      isSide=true
+   elif [ ${board[1,0]} != $Player ] && [ ${board[1,0]} != $Computer ]
+   then
+      board[1,0]=$Computer
+      isSide=true
    fi
 }
 
