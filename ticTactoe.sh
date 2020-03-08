@@ -172,120 +172,127 @@ function checkResult(){
 #BLOCK CELL FOR WINNING
 function isBlockingCell()
 {
-   #ROWS
-   local row=0
-   local col=0
-   for ((row=0; row<ROW; row++))
-   do
-      if [ ${board[$row,$col]} == $Player ] && [ ${board[$(($row)),$(($col+1))]} == $Player ]
+   if [[ $cellBlocked == flase ]]
+   then
+      #ROWS
+      local row=0
+      local col=0
+      for ((row=0; row<ROW; row++))
+      do
+         if [ ${board[$row,$col]} == $Player ] && [ ${board[$(($row)),$(($col+1))]} == $Player ]
+         then
+            if [ ${board[$row,$(($col+2))]} != $Computer ]
+            then
+               board[$row,$(($col+2))]=$Computer
+               cellBlocked=true
+               break
+            fi
+         elif [ ${board[$row,$(($col+1))]} == $Player ] && [ ${board[$row,$(($col+2))]} == $Player ]
+         then
+            if [ ${board[$row,$col]} != $Computer ]
+            then
+               board[$row,$col]=$Computer
+               cellBlocked=true
+               break
+            fi
+         elif [ ${board[$row,$col]} == $Player ] && [ ${board[$row,$(($col+2))]} == $Player ]
+         then
+            if [ ${board[$row,$(($col+1))]} != $Computer ]
+            then
+               board[$row,$(($col+1))]=$Computer
+               cellBlocked=true
+               break
+            fi
+         fi
+      done
+
+      #COLUMNS
+      elif [[ $cellBlocked == false ]]
+      then
+         local row=0
+         local col=0
+         for ((col=0; col<COLUMN; col++))
+         do
+            if [ ${board[$row,$col]} == $Player ] &&  [ ${board[$(($row+1)),$col]} == $Player ]
+            then
+               if [ ${board[$(($row+2)),$col]} != $Computer ]
+               then
+                  board[$(($row+2)),$col]=$Computer
+                  cellBlocked=true
+                  break
+               fi
+            elif [ ${board[$(($row+1)),$col]} == $Player ] && [ ${board[$(($row+2)),$col]} == $Player ]
+            then
+               if [ ${board[$row,$col]} != $Computer ]
+               then
+                  board[$row,$col]=$Computer
+                  cellBlocked=true
+                  break
+               fi
+            elif [ ${board[$row,$col]} == $Player ] && [ ${board[$(($row+2)),$col]} == $Player ]
+            then
+               if [ ${board[$(($row+1)),$col]} != $Computer ]
+               then
+                  board[$(($row+1)),$col]=$Computer
+                  cellBlocked=true
+                  break
+               fi
+            fi
+         done
+
+      #DIAGONAL
+      elif [[ $cellBlocked == false ]]
+      then
+         local row=0
+         local col=0
+         if [ ${board[$row,$col]} == $Player ] &&  [ ${board[$(($row+1)),$(($col+1))]} == $Player ]
+         then
+           if [ ${board[$(($row+2)),$(($col+2))]} != $Computer ]
+           then
+              board[$(($row+2)),$(($col+2))]=$Computer
+              cellBlocked=true
+              return
+           fi
+      elif [ ${board[$(($row+1)),$(($col+1))]} == $Player ] && [ ${board[$(($row+2)),$(($col+2))]} == $Player ]
+      then
+         if [ ${board[$row,$col]} != $Computer ]
+         then
+            board[$row,$col]=$Computer
+            cellBlocked=true
+            return
+         fi
+      elif [ ${board[$row,$col]} == $Player ] && [ ${board[$(($row+2)),$(($col+2))]} == $Player ]
+      then
+         if [ ${board[$(($row+1)),$(($col+1))]} != $Computer ]
+         then
+            board[$(($row+1)),$(($col+1))]=$Computer
+            cellBlocked=true
+            return
+         fi
+      elif [ ${board[$(($row+2)),$col]} == $Player ] &&  [ ${board[$(($row+1)),$(($col+1))]} == $Player ]
       then
          if [ ${board[$row,$(($col+2))]} != $Computer ]
          then
             board[$row,$(($col+2))]=$Computer
             cellBlocked=true
-            break
+            return
          fi
-      elif [ ${board[$row,$(($col+1))]} == $Player ] && [ ${board[$row,$(($col+2))]} == $Player ]
-      then
-         if [ ${board[$row,$col]} != $Computer ]
-         then
-            board[$row,$col]=$Computer
-            cellBlocked=true
-            break
-         fi
-      elif [ ${board[$row,$col]} == $Player ] && [ ${board[$row,$(($col+2))]} == $Player ]
-      then
-         if [ ${board[$row,$(($col+1))]} != $Computer ]
-         then
-            board[$row,$(($col+1))]=$Computer
-            cellBlocked=true
-            break
-         fi
-      fi
-   done
-
-   #COLUMNS
-   local row=0
-   local col=0
-   for ((col=0; col<COLUMN; col++))
-   do
-      if [ ${board[$row,$col]} == $Player ] &&  [ ${board[$(($row+1)),$col]} == $Player ]
+      elif [ ${board[$(($row+1)),$(($col+1))]} == $Player ] && [ ${board[$row,$(($col+2))]} == $Player ]
       then
          if [ ${board[$(($row+2)),$col]} != $Computer ]
          then
             board[$(($row+2)),$col]=$Computer
             cellBlocked=true
-            break
+            return
          fi
-      elif [ ${board[$(($row+1)),$col]} == $Player ] && [ ${board[$(($row+2)),$col]} == $Player ]
+      elif [ ${board[$(($row+2)),$col]} == $Player ] && [ ${board[$row,$(($col+2))]} == $Player ]
       then
-         if [ ${board[$row,$col]} != $Computer ]
+         if [ ${board[$(($row+1)),$(($col+1))]} != $Computer ]
          then
-            board[$row,$col]=$Computer
+            board[$(($row+1)),$(($col+1))]=$Computer
             cellBlocked=true
-            break
+            return
          fi
-      elif [ ${board[$row,$col]} == $Player ] && [ ${board[$(($row+2)),$col]} == $Player ]
-      then
-         if [ ${board[$(($row+1)),$col]} != $Computer ]
-         then
-            board[$(($row+1)),$col]=$Computer
-            cellBlocked=true
-            break
-         fi
-      fi
-   done
-
-   #DIAGONAL
-   local row=0
-   local col=0
-   if [ ${board[$row,$col]} == $Player ] &&  [ ${board[$(($row+1)),$(($col+1))]} == $Player ]
-   then
-      if [ ${board[$(($row+2)),$(($col+2))]} != $Computer ]
-      then
-         board[$(($row+2)),$(($col+2))]=$Computer
-         cellBlocked=true
-         return
-      fi
-   elif [ ${board[$(($row+1)),$(($col+1))]} == $Player ] && [ ${board[$(($row+2)),$(($col+2))]} == $Player ]
-   then
-      if [ ${board[$row,$col]} != $Computer ]
-      then
-         board[$row,$col]=$Computer
-         cellBlocked=true
-         return
-      fi
-   elif [ ${board[$row,$col]} == $Player ] && [ ${board[$(($row+2)),$(($col+2))]} == $Player ]
-   then
-      if [ ${board[$(($row+1)),$(($col+1))]} != $Computer ]
-      then
-         board[$(($row+1)),$(($col+1))]=$Computer
-         cellBlocked=true
-         return
-      fi
-   elif [ ${board[$(($row+2)),$col]} == $Player ] &&  [ ${board[$(($row+1)),$(($col+1))]} == $Player ]
-   then
-      if [ ${board[$row,$(($col+2))]} != $Computer ]
-      then
-         board[$row,$(($col+2))]=$Computer
-         cellBlocked=true
-         return
-      fi
-   elif [ ${board[$(($row+1)),$(($col+1))]} == $Player ] && [ ${board[$row,$(($col+2))]} == $Player ]
-   then
-      if [ ${board[$(($row+2)),$col]} != $Computer ]
-      then
-         board[$(($row+2)),$col]=$Computer
-         cellBlocked=true
-         return
-      fi
-   elif [ ${board[$(($row+2)),$col]} == $Player ] && [ ${board[$row,$(($col+2))]} == $Player ]
-   then
-      if [ ${board[$(($row+1)),$(($col+1))]} != $Computer ]
-      then
-         board[$(($row+1)),$(($col+1))]=$Computer
-         cellBlocked=true
-         return
       fi
    fi
 }
