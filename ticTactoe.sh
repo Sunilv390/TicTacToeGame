@@ -262,18 +262,23 @@ function  computerTurn(){
          return
       fi
    else
-      while [ true ]
-      do
-         local row=$(( RANDOM % $ROW ))
-         local col=$(( RANDOM % $COLUMN ))
-         if [ ${board[$row,$col]} == $Player ] || [ ${board[$row,$col]} == $Computer ]
-         then
-            continue
-         else
-            board[$row,$col]=$Computer
-            break
-         fi
-      done
+      if [ true ]
+      then
+         checkCorners
+      else
+         while [ true ]
+         do
+            local row=$(( RANDOM % $ROW ))
+            local col=$(( RANDOM % $COLUMN ))
+            if [ ${board[$row,$col]} == $Player ] || [ ${board[$row,$col]} == $Computer ]
+            then
+               continue
+            else
+               board[$row,$col]=$Computer
+               break
+            fi
+         done
+      fi
    fi
 }
 
@@ -383,6 +388,27 @@ function checkForCompWin()
       fi
    else
       return
+   fi
+}
+
+#CHECKS CORNER FOR PLACEMENT
+function checkCorners(){
+   if [ ${board[0,0]} != $Player ] && [ ${board[0,0]} != $Computer ]
+   then
+      board[0,0]=$Computer
+      return
+   elif [ ${board[0,2]} != $Player ] && [ ${board[0,2]} != $Computer ]
+   then
+      board[0,2]=$Computer
+      return
+   elif [ ${board[2,0]} != $Player ] && [ ${board[2,0]} != $Computer ]
+   then
+      board[2,0]=$Computer
+      return
+   elif [ ${board[2,2]} != $Player ] && [ ${board[2,2]} != $Computer ]
+   then
+      board[2,2]=$Computer
+   return
    fi
 }
 
