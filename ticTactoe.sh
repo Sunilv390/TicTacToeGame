@@ -112,6 +112,7 @@ function getInput(){
          fi
       else
          echo "Computer Turn"
+         checkForCompWin
          computerTurn
          flag=1
          if [ $(checkResult $Computer) -eq 1 ]
@@ -276,6 +277,114 @@ function  computerTurn(){
    fi
 }
 
+#CHECKS COMPUTER WIN
+function checkForCompWin()
+{
+   #ROW
+   local row=0
+   local col=0
+   for ((row=0; row<ROW; row++))
+   do
+      if [ ${board[$row,$col]} == $Computer ] && [ ${board[$(($row)),$(($col+1))]} == $Computer ]
+      then
+         if [ ${board[$row,$(($col+2))]} != $Player ]
+         then
+            board[$row,$(($col+2))]=$Computer
+            break
+         fi
+      elif [ ${board[$row,$(($col+1))]} == $Computer ] && [ ${board[$row,$(($col+2))]} == $Computer ]
+      then
+         if [ ${board[$row,$col]} != $Player ]
+         then
+            board[$row,$col]=$Computer
+            break
+         fi
+      elif [ ${board[$row,$col]} == $Computer ] && [ ${board[$row,$(($col+2))]} == $Computer ]
+      then
+         if [ ${board[$row,$(($col+1))]} != $Player ]
+         then
+            board[$row,$(($col+1))]=$Computer
+            break
+         fi
+     fi
+   done
+   #COLUMN
+   local row=0
+   local col=0
+   for ((col=0; col<COLUMN; col++))
+   do
+      if [ ${board[$row,$col]} == $Computer ] &&  [ ${board[$(($row+1)),$col]} == $Computer ]
+      then
+         if [ ${board[$(($row+2)),$col]} != $Player ]
+         then
+            board[$(($row+2)),$col]=$Computer
+            break
+         fi
+      elif [ ${board[$(($row+1)),$col]} == $Computer ] && [ ${board[$(($row+2)),$col]} == $Computer ]
+      then
+         if [ ${board[$row,$col]} != $Player ]
+         then
+            board[$row,$col]=$Computer
+            break
+         fi
+      elif [ ${board[$row,$col]} == $Computer ] && [ ${board[$(($row+2)),$col]} == $Computer ]
+      then
+         if [ ${board[$(($row+1)),$col]} != $Player ]
+         then
+            board[$(($row+1)),$col]=$Computer
+            break
+         fi
+      fi
+   done
+   #DIAGONAL
+   local row=0
+   local col=0
+   if [ ${board[$row,$col]} == $Computer ] &&  [ ${board[$(($row+1)),$(($col+1))]} == $Computer ]
+   then
+      if [ ${board[$(($row+2)),$(($col+2))]} != $Player ]
+      then
+         board[$(($row+2)),$(($col+2))]=$Computer
+         return
+      fi
+   elif [ ${board[$(($row+1)),$(($col+1))]} == $Computer ] && [ ${board[$(($row+2)),$(($col+2))]} == $Computer ]
+   then
+      if [ ${board[$row,$col]} != $Player ]
+      then
+         board[$row,$col]=$Computer
+         return
+      fi
+   elif [ ${board[$row,$col]} == $Computer ] && [ ${board[$(($row+2)),$(($col+2))]} == $Computer ]
+   then
+      if [ ${board[$(($row+1)),$(($col+1))]} != $Player ]
+      then
+         board[$(($row+1)),$(($col+1))]=$Computer
+         return
+      fi
+   elif [ ${board[$(($row+2)),$col]} == $Computer ] &&  [ ${board[$(($row+1)),$(($col+1))]} == $Computer ]
+   then
+      if [ ${board[$row,$(($col+2))]} != $Player ]
+      then
+         board[$row,$(($col+2))]=$Computer
+         return
+      fi
+   elif [ ${board[$(($row+1)),$(($col+1))]} == $Computer ] && [ ${board[$row,$(($col+2))]} == $Computer ]
+   then
+      if [ ${board[$(($row+2)),$col]} != $Player ]
+      then
+         board[$(($row+2)),$col]=$Computer
+         return
+      fi
+   elif [ ${board[$(($row+2)),$col]} == $Computer ] && [ ${board[$row,$(($col+2))]} == $Computer ]
+   then
+      if [ ${board[$(($row+1)),$(($col+1))]} != $Player ]
+      then
+         board[$(($row+1)),$(($col+1))]=$Computer
+         return
+      fi
+   else
+      return
+   fi
+}
 
 resetBoard
 assignPlayer
