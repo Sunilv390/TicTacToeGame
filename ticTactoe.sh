@@ -7,6 +7,9 @@ LENGTH=$(($ROW*$COLUMN))
 
 #VARIABLE
 cell=1
+isCorner=''
+isCenter=''
+cellBlocked=''
 
 declare -A board
 
@@ -112,14 +115,20 @@ function getInput(){
          fi
       else
          echo "Computer Turn"
-         checkForCompWin
-         computerTurn
-         flag=1
+         checkCompWin
          if [ $(checkResult $Computer) -eq 1 ]
          then
             echo "Computer Won"
-            return 0
+            exit
          fi
+         isBlockingCell
+         checkCornerAndCenter
+         if [ $isCorner == true ] || [ $isCenter == true ]
+         then
+            $isCorner=false
+            $isCenter=false
+         fi
+         flag=1
       fi
    done
    echo "Match Tie"
@@ -157,7 +166,9 @@ function checkResult(){
    fi
 }
 
-function  computerTurn(){
+#BLOCK CELL FOR WINNING
+function isBlockingCell()
+{
    #ROWS
    local row=0
    local col=0
@@ -165,29 +176,32 @@ function  computerTurn(){
    do
       if [ ${board[$row,$col]} == $Player ] && [ ${board[$(($row)),$(($col+1))]} == $Player ]
       then
-          if [ ${board[$row,$(($col+2))]} != $Computer ]
-          then
-             board[$row,$(($col+2))]=$Computer
-             break
-          fi
+         if [ ${board[$row,$(($col+2))]} != $Computer ]
+         then
+            board[$row,$(($col+2))]=$Computer
+            cellBlocked=true
+            break
+         fi
       elif [ ${board[$row,$(($col+1))]} == $Player ] && [ ${board[$row,$(($col+2))]} == $Player ]
       then
-          if [ ${board[$row,$col]} != $Computer ]
-          then
-             board[$row,$col]=$Computer
-             break
-          fi
+         if [ ${board[$row,$col]} != $Computer ]
+         then
+            board[$row,$col]=$Computer
+            cellBlocked=true
+            break
+         fi
       elif [ ${board[$row,$col]} == $Player ] && [ ${board[$row,$(($col+2))]} == $Player ]
       then
-          if [ ${board[$row,$(($col+1))]} != $Computer ]
-          then
-             board[$row,$(($col+1))]=$Computer
-             break
-          fi
+         if [ ${board[$row,$(($col+1))]} != $Computer ]
+         then
+            board[$row,$(($col+1))]=$Computer
+            cellBlocked=true
+            break
+         fi
       fi
    done
 
-   #COLUMN
+   #COLUMNS
    local row=0
    local col=0
    for ((col=0; col<COLUMN; col++))
@@ -197,6 +211,7 @@ function  computerTurn(){
          if [ ${board[$(($row+2)),$col]} != $Computer ]
          then
             board[$(($row+2)),$col]=$Computer
+            cellBlocked=true
             break
          fi
       elif [ ${board[$(($row+1)),$col]} == $Player ] && [ ${board[$(($row+2)),$col]} == $Player ]
@@ -204,13 +219,15 @@ function  computerTurn(){
          if [ ${board[$row,$col]} != $Computer ]
          then
             board[$row,$col]=$Computer
+            cellBlocked=true
             break
-          fi
+         fi
       elif [ ${board[$row,$col]} == $Player ] && [ ${board[$(($row+2)),$col]} == $Player ]
       then
          if [ ${board[$(($row+1)),$col]} != $Computer ]
          then
             board[$(($row+1)),$col]=$Computer
+            cellBlocked=true
             break
          fi
       fi
@@ -224,6 +241,7 @@ function  computerTurn(){
       if [ ${board[$(($row+2)),$(($col+2))]} != $Computer ]
       then
          board[$(($row+2)),$(($col+2))]=$Computer
+         cellBlocked=true
          return
       fi
    elif [ ${board[$(($row+1)),$(($col+1))]} == $Player ] && [ ${board[$(($row+2)),$(($col+2))]} == $Player ]
@@ -231,6 +249,7 @@ function  computerTurn(){
       if [ ${board[$row,$col]} != $Computer ]
       then
          board[$row,$col]=$Computer
+         cellBlocked=true
          return
       fi
    elif [ ${board[$row,$col]} == $Player ] && [ ${board[$(($row+2)),$(($col+2))]} == $Player ]
@@ -238,6 +257,7 @@ function  computerTurn(){
       if [ ${board[$(($row+1)),$(($col+1))]} != $Computer ]
       then
          board[$(($row+1)),$(($col+1))]=$Computer
+         cellBlocked=true
          return
       fi
    elif [ ${board[$(($row+2)),$col]} == $Player ] &&  [ ${board[$(($row+1)),$(($col+1))]} == $Player ]
@@ -245,6 +265,7 @@ function  computerTurn(){
       if [ ${board[$row,$(($col+2))]} != $Computer ]
       then
          board[$row,$(($col+2))]=$Computer
+         cellBlocked=true
          return
       fi
    elif [ ${board[$(($row+1)),$(($col+1))]} == $Player ] && [ ${board[$row,$(($col+2))]} == $Player ]
@@ -252,6 +273,7 @@ function  computerTurn(){
       if [ ${board[$(($row+2)),$col]} != $Computer ]
       then
          board[$(($row+2)),$col]=$Computer
+         cellBlocked=true
          return
       fi
    elif [ ${board[$(($row+2)),$col]} == $Player ] && [ ${board[$row,$(($col+2))]} == $Player ]
@@ -259,33 +281,15 @@ function  computerTurn(){
       if [ ${board[$(($row+1)),$(($col+1))]} != $Computer ]
       then
          board[$(($row+1)),$(($col+1))]=$Computer
+         cellBlocked=true
          return
-      fi
-   else
-      if [ true ]
-      then
-         checkCorners
-      else
-         while [ true ]
-         do
-            local row=$(( RANDOM % $ROW ))
-            local col=$(( RANDOM % $COLUMN ))
-            if [ ${board[$row,$col]} == $Player ] || [ ${board[$row,$col]} == $Computer ]
-            then
-               continue
-            else
-               board[$row,$col]=$Computer
-               break
-            fi
-         done
       fi
    fi
 }
 
 #CHECKS COMPUTER WIN
-function checkForCompWin()
-{
-   #ROW
+function checkCompWin(){
+   #ROWS
    local row=0
    local col=0
    for ((row=0; row<ROW; row++))
@@ -311,9 +315,10 @@ function checkForCompWin()
             board[$row,$(($col+1))]=$Computer
             break
          fi
-     fi
+      fi
    done
-   #COLUMN
+
+   #COLUMNS
    local row=0
    local col=0
    for ((col=0; col<COLUMN; col++))
@@ -341,6 +346,7 @@ function checkForCompWin()
          fi
       fi
    done
+
    #DIAGONAL
    local row=0
    local col=0
@@ -378,7 +384,7 @@ function checkForCompWin()
       then
          board[$(($row+2)),$col]=$Computer
          return
-      fi
+         fi
    elif [ ${board[$(($row+2)),$col]} == $Computer ] && [ ${board[$row,$(($col+2))]} == $Computer ]
    then
       if [ ${board[$(($row+1)),$(($col+1))]} != $Player ]
@@ -391,24 +397,28 @@ function checkForCompWin()
    fi
 }
 
-#CHECKS CORNER FOR PLACEMENT
-function checkCorners(){
+function checkCornerAndCenter()
+{
    if [ ${board[0,0]} != $Player ] && [ ${board[0,0]} != $Computer ]
    then
       board[0,0]=$Computer
-      return
+      isCorner=true
    elif [ ${board[0,2]} != $Player ] && [ ${board[0,2]} != $Computer ]
    then
       board[0,2]=$Computer
-      return
+      isCorner=true
    elif [ ${board[2,0]} != $Player ] && [ ${board[2,0]} != $Computer ]
    then
       board[2,0]=$Computer
-      return
+      isCorner=true
    elif [ ${board[2,2]} != $Player ] && [ ${board[2,2]} != $Computer ]
    then
       board[2,2]=$Computer
-   return
+      isCorner=true
+   elif [ ${board[1,1]} != $Player ] && [ ${board[1,1]} != $Computer ]
+   then
+      board[1,1]=$Computer
+      isCenter=true
    fi
 }
 
